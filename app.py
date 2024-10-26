@@ -1,4 +1,5 @@
 import os
+from functools import wraps
 from flask import Flask, flash, render_template, send_from_directory, request, jsonify
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
@@ -6,13 +7,15 @@ from flask_caching import Cache
 from dotenv import load_dotenv
 from profile.routes import profile_bp
 from profile.reader import read_cities, save_user_profile, read_user_profiles
-import asyncio
+import jwt
+from datetime import datetime, timedelta
 
 # Load environment variables
 load_dotenv()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'your-jwt-secret-key')
 
 # Initialize the rate limiter
 limiter = Limiter(
@@ -28,6 +31,28 @@ cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 # Register the blueprint
 app.register_blueprint(profile_bp)
 
+# Token verification function
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = None
+        if 'Authorization' in request.headers:
+            auth_header = request.headers['Authorization']
+            if auth_header.startswith('Bearer '):
+                token = auth_header.split(' ')[1]
+        
+        if not token:
+            return jsonify({'message': 'Token is missing!'}), 401
+
+        try:
+            data = jwt.decode(token, app.config['JWT_SECRET_KEY'], algorithms=["HS256"])
+        except:
+            return jsonify({'message': 'Token is invalid!'}), 401
+
+        return f(*args, **kwargs)
+
+    return decorated
+
 # Add a route for the root URL
 @app.route('/')
 @limiter.limit("400 per minute")
@@ -37,6 +62,7 @@ def index():
 # Add a simple API endpoint for testing
 @app.route('/api/test', methods=['GET'])
 @limiter.limit("400 per minute")
+@token_required
 def test_api():
     return jsonify({"message": "This is a test API endpoint"}), 200
 
@@ -49,6 +75,7 @@ def favicon():
 @app.route('/api/cities', methods=['GET'])
 @limiter.limit("400 per minute")
 @cache.cached(timeout=300)  # Cache for 5 minutes
+@token_required
 def get_cities():
     cities = read_cities()
     return jsonify(cities), 200
@@ -56,12 +83,14 @@ def get_cities():
 # API GET route for user_profiles data
 @app.route('/api/user_profiles', methods=['GET'])
 @limiter.limit("400 per minute")
+@token_required
 def get_user_profiles():
     profiles = read_user_profiles()
     return jsonify(profiles), 200
 
 @app.route('/api/user_profiles', methods=['POST'])
 @limiter.limit("400 per minute")
+@token_required
 def add_user_profile():
     data = request.json
     if not data:
@@ -86,7 +115,8 @@ def add_user_profile():
         cache.delete('cities')  # Invalidate the cities cache
         return jsonify({"message": "User profile saved successfully"}), 201
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        app.logger.error(f"Error saving user profile: {str(e)}")
+        return jsonify({"error": "An error occurred while saving the user profile."}), 500
 
 # Global variable to store the last modification time of the CSV file
 last_modified_time = 0
@@ -104,11 +134,28 @@ def csv_modified():
 
 @app.route('/api/cities/check-updates', methods=['GET'])
 @limiter.limit("60 per minute")
+@token_required
 def check_city_updates():
     if csv_modified():
         cities = read_cities()
         return jsonify({"updated": True, "cities": cities}), 200
     return jsonify({"updated": False}), 200
+
+# New route for generating tokens
+@app.route('/api/token', methods=['POST'])
+def generate_token():
+    auth = request.authorization
+    if not auth or not auth.username or not auth.password:
+        return jsonify({'message': 'Could not verify', 'WWW-Authenticate': 'Basic realm="Login required!"'}), 401
+
+    # Here you should check the username and password against your user database
+    # For this example, we're using a hardcoded username and password
+    if auth.username == 'admin' and auth.password == 'password':
+        token = jwt.encode({'user': auth.username, 'exp': datetime.utcnow() + timedelta(hours=24)},
+                           app.config['JWT_SECRET_KEY'])
+        return jsonify({'token': token})
+
+    return jsonify({'message': 'Could not verify', 'WWW-Authenticate': 'Basic realm="Login required!"'}), 401
 
 @app.errorhandler(404)
 def page_not_found(e):
