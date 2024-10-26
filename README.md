@@ -1,18 +1,15 @@
 
-# 🏙️ City Profile Manager
+# 🏙️ Wishfin
 
-> Empowering User Profiles with City Connections! 🌆🔗👤
+> Wishfin Hackathon! 🌆🔗👤
 
-![City Profile Manager Banner]![image](https://github.com/user-attachments/assets/bfc7417f-d72d-4816-a5bd-92ef982101cb)
+![hackathon]![image](https://github.com/user-attachments/assets/bfc7417f-d72d-4816-a5bd-92ef982101cb)
 
 
-## 🌟 Welcome to City Profile Manager!
+## 🌟 Welcome to City profile Manager!
 
 City Profile Manager is more than just another web app—it's your digital bridge connecting users to cities! 🌉✨ Built with Flask and cutting-edge web technologies, it streamlines the creation and management of user profiles linked to cities.
 
-### 🎯 Our Mission
-
-To create a seamless, intuitive, and enjoyable digital experience for users to connect with cities. Because in our interconnected world, location matters! 🌍
 
 ## ✨ Features
 
@@ -97,7 +94,7 @@ Testing using Postman
 
 5. **Run the application:**
    \`\`\`bash
-   flask run
+   python app.py
    \`\`\`
 
 6. **Open your browser and navigate to:**
