@@ -1,20 +1,29 @@
+import os
 from flask import Flask, flash, render_template, send_from_directory, request, jsonify
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from flask_caching import Cache
+from dotenv import load_dotenv
 from profile.routes import profile_bp
 from profile.reader import read_cities, save_user_profile, read_user_profiles
-import os
+import asyncio
+
+# Load environment variables
+load_dotenv()
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'wishfin'
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
 # Initialize the rate limiter
 limiter = Limiter(
     get_remote_address,
     app=app,
-    default_limits=["200 per day", "50 per hour"],
+    default_limits=["2000 per day", "500 per hour"],
     storage_uri="memory://"
 )
+
+# Initialize caching
+cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 
 # Register the blueprint
 app.register_blueprint(profile_bp)
@@ -39,6 +48,7 @@ def favicon():
 # New API routes
 @app.route('/api/cities', methods=['GET'])
 @limiter.limit("400 per minute")
+@cache.cached(timeout=300)  # Cache for 5 minutes
 def get_cities():
     cities = read_cities()
     return jsonify(cities), 200
@@ -58,6 +68,7 @@ def add_user_profile():
     
     try:
         save_user_profile(data['name'], data['city_id'])
+        cache.delete('cities')  # Invalidate the cities cache
         return jsonify({"message": "User profile saved successfully"}), 201
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -72,11 +83,12 @@ def csv_modified():
     current_modified_time = os.path.getmtime(csv_path)
     if current_modified_time > last_modified_time:
         last_modified_time = current_modified_time
+        cache.delete('cities')  # Invalidate the cities cache
         return True
     return False
 
 @app.route('/api/cities/check-updates', methods=['GET'])
-@limiter.limit("60 per minute")  # This route keeps its original rate limit
+@limiter.limit("60 per minute")
 def check_city_updates():
     if csv_modified():
         cities = read_cities()
@@ -93,7 +105,8 @@ def ratelimit_handler(e):
 
 @app.errorhandler(Exception)
 def handle_error(e):
+    app.logger.error(f"An unexpected error occurred: {str(e)}")
     return jsonify({"error": "An unexpected error occurred", "message": str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=os.getenv('FLASK_DEBUG', 'False') == 'True')
