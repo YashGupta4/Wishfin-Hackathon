@@ -45,7 +45,7 @@ def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static'),
                                'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
-# New API routes
+# API GET route for cities data
 @app.route('/api/cities', methods=['GET'])
 @limiter.limit("400 per minute")
 @cache.cached(timeout=300)  # Cache for 5 minutes
@@ -53,6 +53,7 @@ def get_cities():
     cities = read_cities()
     return jsonify(cities), 200
 
+# API GET route for user_profiles data
 @app.route('/api/user_profiles', methods=['GET'])
 @limiter.limit("400 per minute")
 def get_user_profiles():
@@ -63,8 +64,22 @@ def get_user_profiles():
 @limiter.limit("400 per minute")
 def add_user_profile():
     data = request.json
-    if not data or 'name' not in data or 'city_id' not in data:
-        return jsonify({"error": "Invalid data. Please provide name and city_id."}), 400
+    if not data:
+        return jsonify({"error": "Empty submission. Please provide data."}), 400
+    
+    name = data.get('name')
+    city_id = data.get('city_id')
+    
+    if not name or not city_id:
+        missing_fields = []
+        if not name:
+            missing_fields.append('name')
+        if not city_id:
+            missing_fields.append('city_id')
+        return jsonify({"error": f"Missing required fields: {', '.join(missing_fields)}"}), 400
+    
+    if not name.strip():
+        return jsonify({"error": "Name cannot be empty or just whitespace."}), 400
     
     try:
         save_user_profile(data['name'], data['city_id'])
