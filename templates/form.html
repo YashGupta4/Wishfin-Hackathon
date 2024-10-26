@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Profile Form</title>
+    <title>User Profile Form with City Search</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -51,13 +51,6 @@
             box-sizing: border-box;
             font-size: 16px;
         }
-        select {
-            appearance: none;
-            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007CB2%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
-            background-repeat: no-repeat;
-            background-position: right 10px top 50%;
-            background-size: 12px auto;
-        }
         button {
             width: 100%;
             padding: 10px;
@@ -77,6 +70,36 @@
             color: #7f8c8d;
             font-style: italic;
         }
+        .city-search-container {
+            position: relative;
+        }
+        .city-search-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+        .city-list {
+            display: none;
+            position: absolute;
+            width: 100%;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+            background-color: white;
+            z-index: 1000;
+        }
+        .city-list div {
+            padding: 10px;
+            cursor: pointer;
+        }
+        .city-list div:hover {
+            background-color: #f0f2f5;
+        }
     </style>
 </head>
 <body>
@@ -92,18 +115,23 @@
             </div>
             <div class="form-group">
                 <label for="city">City:</label>
-                <select id="city" name="city" required>
-                    <option value="">Loading cities...</option>
-                </select>
+                <div class="city-search-container">
+                    <input type="text" id="citySearch" class="city-search-input" placeholder="Search for a city">
+                    <div id="cityList" class="city-list"></div>
+                </div>
+                <input type="hidden" id="cityId" name="city" required>
             </div>
             <button type="submit">Submit</button>
         </form>
     </div>
 
     <script>
-        const citySelect = document.getElementById('city');
+        const citySearch = document.getElementById('citySearch');
+        const cityList = document.getElementById('cityList');
+        const cityIdInput = document.getElementById('cityId');
         const form = document.getElementById('userProfileForm');
         const successMessage = document.getElementById('successMessage');
+        let cities = [];
 
         async function fetchCities() {
             try {
@@ -111,23 +139,45 @@
                 if (!response.ok) {
                     throw new Error('Failed to fetch cities');
                 }
-                const cities = await response.json();
-                updateCityDropdown(cities);
+                cities = await response.json();
+                updateCityList();
             } catch (error) {
                 console.error('Error fetching cities:', error);
-                citySelect.innerHTML = '<option value="">Failed to load cities</option>';
+                citySearch.placeholder = 'Failed to load cities';
             }
         }
 
-        function updateCityDropdown(cities) {
-            citySelect.innerHTML = '<option value="">Select a city</option>';
-            cities.forEach(city => {
-                const option = document.createElement('option');
-                option.value = city.id;
-                option.textContent = city.name;
-                citySelect.appendChild(option);
+        function updateCityList(filter = '') {
+            cityList.innerHTML = '';
+            const filteredCities = cities.filter(city => 
+                city.name.toLowerCase().includes(filter.toLowerCase())
+            );
+            filteredCities.forEach(city => {
+                const div = document.createElement('div');
+                div.textContent = city.name;
+                div.addEventListener('click', () => {
+                    citySearch.value = city.name;
+                    cityIdInput.value = city.id;
+                    cityList.style.display = 'none';
+                });
+                cityList.appendChild(div);
             });
+            cityList.style.display = filteredCities.length > 0 ? 'block' : 'none';
         }
+
+        citySearch.addEventListener('input', () => {
+            updateCityList(citySearch.value);
+        });
+
+        citySearch.addEventListener('focus', () => {
+            updateCityList(citySearch.value);
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!citySearch.contains(e.target) && !cityList.contains(e.target)) {
+                cityList.style.display = 'none';
+            }
+        });
 
         // Fetch cities immediately when the page loads
         fetchCities();
@@ -151,6 +201,11 @@
             const name = formData.get('name');
             const cityId = formData.get('city');
             
+            if (!cityId) {
+                alert('Please select a city from the list.');
+                return;
+            }
+
             try {
                 const response = await fetch('/api/user_profiles', {
                     method: 'POST',
@@ -163,6 +218,7 @@
                 if (response.ok) {
                     successMessage.style.display = 'block';
                     form.reset();
+                    citySearch.value = '';
                     setTimeout(() => {
                         successMessage.style.display = 'none';
                     }, 3000);
