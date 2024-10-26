@@ -37,7 +37,7 @@ def read_cities():
     return cities
 
 
-def save_user_profile(name, city_id):
+# def save_user_profile(name, city_id):
     file_path = os.path.join(os.path.dirname(__file__), '..', 'user_profiles.csv')
     try:
         # Check if the file exists, if not create it with headers
@@ -53,20 +53,63 @@ def save_user_profile(name, city_id):
     except Exception as e:
         print(f"Error saving user profile: {str(e)}")
         raise  # Re-raise the exception to be caught in the route handler
-
+def save_user_profile(name, city_id):
+    file_path = os.path.join(os.path.dirname(__file__), '..', 'user_profiles.csv')
+    try:
+        with open(file_path, 'a', newline='', encoding='utf-8') as file:
+            writer = csv.writer(file)
+            writer.writerow([name, city_id])
+        print(f"Saved user profile: {name}, {city_id}")  # Debug print
+    except Exception as e:
+        print(f"Error saving user profile: {str(e)}")
+        raise  # Re-raise the exception to be caught in the route handler
 
 def read_user_profiles():
     profiles = []
     file_path = os.path.join(os.path.dirname(__file__), '..', 'user_profiles.csv')
+    print(f"Attempting to read user profiles from: {file_path}")  # Debug print
+    
+    if not os.path.exists(file_path):
+        print(f"Error: {file_path} does not exist.")
+        return profiles
+
     try:
         encoding = detect_encoding(file_path)
+        print(f"Detected encoding: {encoding}")  # Debug print
+        
         with open(file_path, 'r', encoding=encoding) as file:
-            reader = csv.DictReader(file)
+            content = file.read().strip()
+            print(f"File content:\n{content}")  # Debug print
+            
+            if not content:
+                print("user_profiles.csv is empty.")
+                return profiles
+
+            file.seek(0)  # Reset file pointer to the beginning
+            reader = csv.reader(file)
             for row in reader:
-                profiles.append({'name': row['name'], 'city_id': row['city_id']})
+                if len(row) >= 2:
+                    profiles.append({'name': row[0], 'city_id': row[1]})
+                    print(f"Added profile: {profiles[-1]}")  # Debug print
+                else:
+                    print(f"Skipping invalid row: {row}")  # Debug print
+        
         print(f"Read {len(profiles)} user profiles")  # Debug print
     except FileNotFoundError:
         print("user_profiles.csv file not found.")
     except Exception as e:
         print(f"Error reading user_profiles.csv: {str(e)}")
+        import traceback
+        print(traceback.format_exc())  # Print full traceback
+    
     return profiles
+
+# Add this test function at the end of the file
+def test_read_user_profiles():
+    profiles = read_user_profiles()
+    print(f"Test result: Read {len(profiles)} user profiles")
+    for profile in profiles:
+        print(f"Profile: {profile}")
+
+if __name__ == "__main__":
+    test_read_user_profiles()
