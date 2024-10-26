@@ -25,12 +25,12 @@ City Profile Manager is more than just another web app—it's your digital bridg
 ### 🚦 Rate Limiting for Smooth Performance
 - 🚀 Fast & Smooth: Up to 400 requests/minute.
 
+### 🛡️ Improved Input Validation
+- **Clean Data:** User input for names and city IDs is validated to ensure accuracy and prevent empty submissions.
+- **Better Error Messages:** Clear error messages guide users to provide the required fields correctly.
+  
 ### 🎨 User-Friendly Interface
 - 🌈 Consistent, smooth user experience.
-
-### 🔔 Stay Informed
-- 🔄 City Updates: Stay in sync with real-time city list changes.
-- ⚡ Quick Profile Creation: Add profiles quickly without any hassle.
 
 ### 🛡️ Robust Security
 - 🔒 Protects against unauthorized actions, keeping your data safe.
@@ -45,10 +45,6 @@ City Profile Manager is more than just another web app—it's your digital bridg
 ### 🔒 Secure Configuration Management
 - **Environment Variables:** Sensitive information, such as secret keys, is stored securely in environment variables using `.env` files, making the app more secure and easier to manage across different environments.
 
-### 🚦 Advanced Rate Limiting
-- **User Protection:** Basic rate limits are still in place, capping requests to prevent abuse and ensure fair usage.
-- **Future-Ready:** The groundwork for user-specific rate limits is laid, making it easier to implement personalized limits in the future.
-
 ### ⚡ Performance Boost with Caching
 - **Cached City Data:** Frequently accessed city data is cached for 5 minutes, improving performance.
 - **Cache Invalidation:** The cache automatically clears when new profiles are added or when the city data changes, ensuring the most up-to-date information.
@@ -56,21 +52,13 @@ City Profile Manager is more than just another web app—it's your digital bridg
 ### 🛠️ Controlled Debug Mode
 - **Debug Flexibility:** Debug mode is now controlled by the `FLASK_DEBUG` environment variable, ensuring that debugging features are only enabled in development.
 
-### 📜 Detailed Logging
-- **Clear Logs:** Unexpected errors are logged, providing clear visibility into issues and making it easier to maintain the application.
-
-### 🛡️ Improved Input Validation
-- **Clean Data:** User input for names and city IDs is validated to ensure accuracy and prevent empty submissions.
-- **Better Error Messages:** Clear error messages guide users to provide the required fields correctly.
-
-
 ### 🛠️ API Endpoints
 - 🏙️ `/api/cities`: Retrieve city data.
 - 👥 `/api/user_profiles`: Manage user profiles.
 - 🔄 `/api/cities/check-updates`: Check for city data updates.
 - 🧪 `/api/test`: Verify API health.
 
-Testing using Postman
+# Testing using Postman
 1. For City Names
    Image
 ![image](https://github.com/user-attachments/assets/a1e81e9f-b087-4985-87d4-96d7eadaee53)
