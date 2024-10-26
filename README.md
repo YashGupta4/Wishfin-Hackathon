@@ -13,48 +13,48 @@ City Profile Manager is more than just another web app—it's your digital bridg
 
 ## ✨ Features
 
-### 👤 User Profile Management
+### 1. 👤 User Profile Management
 - 📝 Quick Setup:Create profiles easily (name + city = done!)
 - 🔍 View Profiles: See all saved profiles with just one click..
 
-### 🔑 Secure Access with Bearer Token
+### 2. 🔑 Secure Access with Bearer Token
 - Protected Endpoints: Access to key API routes is secured using JWT Bearer tokens, ensuring that only authenticated users can interact with sensitive endpoints.
 - Token-Based Authentication: Users must include a valid token in the request header to access protected resources, enhancing overall security.
 - Easy Token Generation: Users can easily generate a token via the /api/token endpoint using Basic Auth.
 
-### 🏙️ Dynamic City Management
+### 3. 🏙️ Dynamic City Management
 - 🔄 Latest Cities: Always up-to-date city list (powered by CSV).
 - 🔎 Search in Dropdown: Use the built-in search box in the dropdown to quickly find your city.
 - 🚀 Automatic Updates: Auto-updates when city data changes (no refresh needed!).
 
-### 🚦 Rate Limiting for Smooth Performance
+### 4. 🚦 Rate Limiting for Smooth Performance
 - 🚀 Fast & Smooth: Up to 400 requests/minute.
 
-### 🛡️ Improved Input Validation
+### 5. 🛡️ Improved Input Validation
 - **Clean Data:** User input for names and city IDs is validated to ensure accuracy and prevent empty submissions.
 - **Better Error Messages:** Clear error messages guide users to provide the required fields correctly.
   
-### 🎨 User-Friendly Interface
+### 6. 🎨 User-Friendly Interface
 - 🌈 Consistent, smooth user experience.
 
-### 🛡️ Robust Security
+### 7. 🛡️ Robust Security
 - 🔒 Protects against unauthorized actions, keeping your data safe.
 - 🔐 Your information is securely stored and managed.
 
-### ⏱️ Asynchronous Operations
+### 8. ⏱️ Asynchronous Operations
 - **Faster Response:** Asynchronous I/O prevents the app from getting stuck while reading or writing files, making the app more responsive, especially under load.
 
-### ⚙️ Better Error Handling
+### 9. ⚙️ Better Error Handling
 - **Logged Errors:** Unexpected errors are now logged, helping developers troubleshoot and monitor the app effectively.
 
-### 🔒 Secure Configuration Management
+### 10. 🔒 Secure Configuration Management
 - **Environment Variables:** Sensitive information, such as secret keys, is stored securely in environment variables using `.env` files, making the app more secure and easier to manage across different environments.
 
-### ⚡ Performance Boost with Caching
+### 11.⚡ Performance Boost with Caching
 - **Cached City Data:** Frequently accessed city data is cached for 5 minutes, improving performance.
 - **Cache Invalidation:** The cache automatically clears when new profiles are added or when the city data changes, ensuring the most up-to-date information.
 
-### 🛠️ Controlled Debug Mode
+### 12. 🛠️ Controlled Debug Mode
 - **Debug Flexibility:** Debug mode is now controlled by the `FLASK_DEBUG` environment variable, ensuring that debugging features are only enabled in development.
 
 ### 🛠️ API Endpoints
