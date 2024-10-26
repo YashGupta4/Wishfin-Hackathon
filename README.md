@@ -61,19 +61,27 @@ City Profile Manager is more than just another web app—it's your digital bridg
 # Testing using Postman
 1. For City Names
    Image
-![image](https://github.com/user-attachments/assets/a1e81e9f-b087-4985-87d4-96d7eadaee53)
+![image](https://github.com/user-attachments/assets/deef2449-def3-4bb6-b060-ac29a84e541c)
+
 
 2. For user-profiles
    Image
-![image](https://github.com/user-attachments/assets/09fa6c1c-e7e8-45f9-be48-e270c304c61e)
+![image](https://github.com/user-attachments/assets/d9af3cdc-2929-480d-85da-f7db1c727e5c)
+
 
 3. For checking updates in city_names.csv
    Image
-![image](https://github.com/user-attachments/assets/917d7d49-07aa-4b9c-ba9a-ca67b6a78a7f)
+![image](https://github.com/user-attachments/assets/2531eeca-0db3-440f-ba74-6fb1dbdbf48f)
+
 
 4. For Api Testing
    Image
-   ![image](https://github.com/user-attachments/assets/61e21f4f-4234-4a9b-9c0b-4347e34a4fc9)
+   ![image](https://github.com/user-attachments/assets/badb11a3-5b4c-49e6-85f1-aeca40151ef1)
+
+   
+5. For Bearer Token
+   Image
+   ![image](https://github.com/user-attachments/assets/23cdf3ac-0ffe-44e6-af9d-43c2910db945)
 
 
 ## 🚀 Get Started with City Profile Manager
