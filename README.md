@@ -3,7 +3,8 @@
 
 > Empowering User Profiles with City Connections! 🌆🔗👤
 
-![City Profile Manager Banner](https://example.com/city-profile-manager-banner.png)
+![City Profile Manager Banner]![image](https://github.com/user-attachments/assets/bfc7417f-d72d-4816-a5bd-92ef982101cb)
+
 
 ## 🌟 Welcome to City Profile Manager!
 
@@ -46,6 +47,20 @@ To create a seamless, intuitive, and enjoyable digital experience for users to c
 - 👥 `/api/user_profiles`: Manage user profiles.
 - 🔄 `/api/cities/check-updates`: Check for city data updates.
 - 🧪 `/api/test`: Verify API health.
+
+Testing using Postman
+1. For City Names
+![image](https://github.com/user-attachments/assets/a1e81e9f-b087-4985-87d4-96d7eadaee53)
+
+2.For user-profiles
+![image](https://github.com/user-attachments/assets/09fa6c1c-e7e8-45f9-be48-e270c304c61e)
+
+3.For checking updates in city_names.csv
+   ![image](https://github.com/user-attachments/assets/917d7d49-07aa-4b9c-ba9a-ca67b6a78a7f)
+
+4. For Api Testing
+   ![image](https://github.com/user-attachments/assets/61e21f4f-4234-4a9b-9c0b-4347e34a4fc9)
+
 
 ## 🚀 Get Started with City Profile Manager
 
