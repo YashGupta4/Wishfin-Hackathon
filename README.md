@@ -17,6 +17,11 @@ City Profile Manager is more than just another web app—it's your digital bridg
 - 📝 Quick Setup:Create profiles easily (name + city = done!)
 - 🔍 View Profiles: See all saved profiles with just one click..
 
+### 🔑 Secure Access with Bearer Token
+- Protected Endpoints: Access to key API routes is secured using JWT Bearer tokens, ensuring that only authenticated users can interact with sensitive endpoints.
+- Token-Based Authentication: Users must include a valid token in the request header to access protected resources, enhancing overall security.
+- Easy Token Generation: Users can easily generate a token via the /api/token endpoint using Basic Auth.
+
 ### 🏙️ Dynamic City Management
 - 🔄 Latest Cities: Always up-to-date city list (powered by CSV).
 - 🔎 Search in Dropdown: Use the built-in search box in the dropdown to quickly find your city.
