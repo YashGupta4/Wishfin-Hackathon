@@ -27,8 +27,6 @@ City Profile Manager is more than just another web app—it's your digital bridg
 - 🔐 Secure handling of sensitive information.
 
 ### 🚦 Rate Limiting for Smooth Performance
-- 🚗 Up to 200 requests/day.
-- 🏎️ Up to 50 requests/hour.
 - 🚀 Up to 400 requests/minute.
 
 ### 🎨 User-Friendly Interface
