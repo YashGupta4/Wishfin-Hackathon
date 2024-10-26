@@ -36,6 +36,33 @@ City Profile Manager is more than just another web app—it's your digital bridg
 - 🔒 Protects against unauthorized actions, keeping your data safe.
 - 🔐 Your information is securely stored and managed.
 
+### ⏱️ Asynchronous Operations
+- **Faster Response:** Asynchronous I/O prevents the app from getting stuck while reading or writing files, making the app more responsive, especially under load.
+
+### ⚙️ Better Error Handling
+- **Logged Errors:** Unexpected errors are now logged, helping developers troubleshoot and monitor the app effectively.
+
+### 🔒 Secure Configuration Management
+- **Environment Variables:** Sensitive information, such as secret keys, is stored securely in environment variables using `.env` files, making the app more secure and easier to manage across different environments.
+
+### 🚦 Advanced Rate Limiting
+- **User Protection:** Basic rate limits are still in place, capping requests to prevent abuse and ensure fair usage.
+- **Future-Ready:** The groundwork for user-specific rate limits is laid, making it easier to implement personalized limits in the future.
+
+### ⚡ Performance Boost with Caching
+- **Cached City Data:** Frequently accessed city data is cached for 5 minutes, improving performance.
+- **Cache Invalidation:** The cache automatically clears when new profiles are added or when the city data changes, ensuring the most up-to-date information.
+
+### 🛠️ Controlled Debug Mode
+- **Debug Flexibility:** Debug mode is now controlled by the `FLASK_DEBUG` environment variable, ensuring that debugging features are only enabled in development.
+
+### 📜 Detailed Logging
+- **Clear Logs:** Unexpected errors are logged, providing clear visibility into issues and making it easier to maintain the application.
+
+### 🛡️ Improved Input Validation
+- **Clean Data:** User input for names and city IDs is validated to ensure accuracy and prevent empty submissions.
+- **Better Error Messages:** Clear error messages guide users to provide the required fields correctly.
+
 
 ### 🛠️ API Endpoints
 - 🏙️ `/api/cities`: Retrieve city data.
