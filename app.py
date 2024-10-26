@@ -16,6 +16,7 @@ load_dotenv()
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'your-jwt-secret-key')
+port = int(os.getenv("PORT", 5000))
 
 # Initialize the rate limiter
 limiter = Limiter(
@@ -171,4 +172,4 @@ def handle_error(e):
     return jsonify({"error": "An unexpected error occurred", "message": str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=os.getenv('FLASK_DEBUG', 'False') == 'True')
+    app.run(host='0.0.0.0', port=port, debug=os.getenv('FLASK_DEBUG', 'False') == 'True')
