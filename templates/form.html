@@ -33,6 +33,7 @@
             border-radius: 4px;
             margin-bottom: 20px;
             text-align: center;
+            display: none;
         }
         .form-group {
             margin-bottom: 20px;
@@ -42,8 +43,7 @@
             margin-bottom: 5px;
             color: #34495e;
         }
-        input[type="text"],
-        select {
+        input[type="text"] {
             width: 100%;
             padding: 10px;
             border: 1px solid #bdc3c7;
@@ -105,7 +105,7 @@
 <body>
     <div class="card">
         <h1>User Profile Form</h1>
-        <div class="success-message" id="successMessage" style="display: none;">
+        <div id="successMessage" class="success-message">
             Profile saved successfully!
         </div>
         <form id="userProfileForm">
@@ -133,14 +133,64 @@
         const successMessage = document.getElementById('successMessage');
         let cities = [];
 
+        async function getToken() {
+            const username = 'admin'; // Replace with actual username input
+            const password = 'password'; // Replace with actual password input
+            try {
+                const response = await fetch('/api/token', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Basic ' + btoa(username + ":" + password)
+                    }
+                });
+                if (!response.ok) {
+                    throw new Error('Failed to get token');
+                }
+                const data = await response.json();
+                localStorage.setItem('token', data.token);
+                return data.token;
+            } catch (error) {
+                console.error('Error getting token:', error);
+                return null;
+            }
+        }
+
+        async function fetchWithAuth(url, options = {}) {
+            let token = localStorage.getItem('token');
+            if (!token) {
+                token = await getToken();
+                if (!token) {
+                    throw new Error('Unable to authenticate');
+                }
+            }
+            const authOptions = {
+                ...options,
+                headers: {
+                    ...options.headers,
+                    'Authorization': `Bearer ${token}`
+                }
+            };
+            const response = await fetch(url, authOptions);
+            if (response.status === 401) {
+                // Token might be expired, try to get a new one
+                token = await getToken();
+                if (!token) {
+                    throw new Error('Unable to authenticate');
+                }
+                authOptions.headers['Authorization'] = `Bearer ${token}`;
+                return fetch(url, authOptions);
+            }
+            return response;
+        }
+
         async function fetchCities() {
             try {
-                const response = await fetch('/api/cities');
+                const response = await fetchWithAuth('/api/cities');
                 if (!response.ok) {
                     throw new Error('Failed to fetch cities');
                 }
                 cities = await response.json();
-                updateCityList();
+                updateCityList(citySearch.value);
             } catch (error) {
                 console.error('Error fetching cities:', error);
                 citySearch.placeholder = 'Failed to load cities';
@@ -179,21 +229,19 @@
             }
         });
 
-        // Fetch cities immediately when the page loads
-        fetchCities();
-
-        // Periodically check for updates (every 5 minutes)
-        setInterval(async () => {
+        async function checkCityUpdates() {
             try {
-                const response = await fetch('/api/cities/check-updates');
+                const response = await fetchWithAuth('/api/cities/check-updates');
                 const data = await response.json();
                 if (data.updated) {
-                    fetchCities();
+                    cities = data.cities; // Update the cities array with new data
+                    updateCityList(citySearch.value); // Update the displayed list
+                    console.log('Cities updated:', cities); // Log the updated cities
                 }
             } catch (error) {
                 console.error('Error checking for city updates:', error);
             }
-        }, 300000); // 5 minutes in milliseconds
+        }
 
         form.addEventListener('submit', async function(event) {
             event.preventDefault();
@@ -207,7 +255,7 @@
             }
 
             try {
-                const response = await fetch('/api/user_profiles', {
+                const response = await fetchWithAuth('/api/user_profiles', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -219,6 +267,7 @@
                     successMessage.style.display = 'block';
                     form.reset();
                     citySearch.value = '';
+                    cityIdInput.value = '';
                     setTimeout(() => {
                         successMessage.style.display = 'none';
                     }, 3000);
@@ -230,6 +279,15 @@
                 alert('An error occurred while saving the profile: ' + error.message);
             }
         });
+
+        // Initial fetch of cities
+        fetchCities();
+
+        // Check for city updates every 4 seconds (for testing purposes only)
+        setInterval(checkCityUpdates, 4000);
+
+        // Initial token fetch
+        getToken();
     </script>
 </body>
 </html>
