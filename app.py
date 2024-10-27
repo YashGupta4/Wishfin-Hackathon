@@ -47,20 +47,21 @@ def token_required(f):
 
         try:
             data = jwt.decode(token, app.config['JWT_SECRET_KEY'], algorithms=["HS256"])
-        except:
-            return jsonify({'message': 'Token is invalid!'}), 401
+            # You might want to add additional checks here, like verifying the user still exists
+        except jwt.ExpiredSignatureError: # code
+            return jsonify({'message': 'Token has expired!'}), 401
+        except jwt.InvalidTokenError:
+            return jsonify({'message': 'Invalid token!'}), 401
 
         return f(*args, **kwargs)
 
     return decorated
 
-# Add a route for the root URL
 @app.route('/')
 @limiter.limit("400 per minute")
 def index():
     return profile_bp.profile_form()
 
-# Add a simple API endpoint for testing
 @app.route('/api/test', methods=['GET'])
 @limiter.limit("400 per minute")
 @token_required
@@ -72,16 +73,13 @@ def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static'),
                                'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
-# API GET route for cities data
 @app.route('/api/cities', methods=['GET'])
 @limiter.limit("400 per minute")
-@cache.cached(timeout=300)  # Cache for 5 minutes
 @token_required
 def get_cities():
     cities = read_cities()
     return jsonify(cities), 200
 
-# API GET route for user_profiles data
 @app.route('/api/user_profiles', methods=['GET'])
 @limiter.limit("400 per minute")
 @token_required
@@ -142,16 +140,13 @@ def check_city_updates():
         return jsonify({"updated": True, "cities": cities}), 200
     return jsonify({"updated": False}), 200
 
-# New route for generating tokens
 @app.route('/api/token', methods=['POST'])
 def generate_token():
     auth = request.authorization
     if not auth or not auth.username or not auth.password:
-        return jsonify({'message': 'Could not verify', 'WWW-Authenticate': 'Basic realm="Login required!"'}), 401
+        return  jsonify({'message': 'Could not verify', 'WWW-Authenticate': 'Basic realm="Login required!"'}), 401
 
-    # Here you should check the username and password against your user database
-    # For this example, we're using a hardcoded username and password
-    if auth.username == 'admin' and auth.password == 'password':
+    if auth.username == os.getenv('API_USERNAME') and auth.password == os.getenv('API_PASSWORD'):
         token = jwt.encode({'user': auth.username, 'exp': datetime.utcnow() + timedelta(hours=24)},
                            app.config['JWT_SECRET_KEY'])
         return jsonify({'token': token})
